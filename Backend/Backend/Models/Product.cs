@@ -1,4 +1,6 @@
-﻿namespace Backend.Models
+﻿using System.Collections.Generic;
+
+namespace Backend.Models
 {
     public class Product
     {
@@ -7,5 +9,6 @@
         public string Picture { get; set; }
         public double Price { get; set; }
         public string Description { get; set; }
+        public List<OrderDetail> OrderDetails { set; get; }
     }
 }

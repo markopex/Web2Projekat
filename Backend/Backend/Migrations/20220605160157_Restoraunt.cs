@@ -2,7 +2,7 @@
 
 namespace Backend.Migrations
 {
-    public partial class DeliveryDbMigration : Migration
+    public partial class Restoraunt : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,7 +33,8 @@ namespace Backend.Migrations
                     Birthday = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    Picture = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Picture = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DelivererRequestStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,12 +47,13 @@ namespace Backend.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerEmail = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CustomerEmail = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DelivererEmail = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UTCTimeOrdered = table.Column<long>(type: "bigint", nullable: false),
-                    UTCTimeDeliveryStarted = table.Column<long>(type: "bigint", nullable: false)
+                    UTCTimeDeliveryStarted = table.Column<long>(type: "bigint", nullable: false),
+                    DeliveredTimeExpected = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,22 +62,22 @@ namespace Backend.Migrations
                         name: "FK_Orders_Users_CustomerEmail",
                         column: x => x.CustomerEmail,
                         principalTable: "Users",
-                        principalColumn: "Email",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Email");
                     table.ForeignKey(
                         name: "FK_Orders_Users_DelivererEmail",
                         column: x => x.DelivererEmail,
                         principalTable: "Users",
-                        principalColumn: "Email",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Email");
                 });
 
             migrationBuilder.CreateTable(
                 name: "OrderDetails",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: true),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<long>(type: "bigint", nullable: false),
                     ProductPrice = table.Column<double>(type: "float", nullable: false)
                 },
@@ -83,8 +85,8 @@ namespace Backend.Migrations
                 {
                     table.PrimaryKey("PK_OrderDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Orders_Id",
-                        column: x => x.Id,
+                        name: "FK_OrderDetails_Orders_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -92,9 +94,13 @@ namespace Backend.Migrations
                         name: "FK_OrderDetails_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_OrderId",
+                table: "OrderDetails",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ProductId",

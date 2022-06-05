@@ -12,6 +12,7 @@ namespace Backend.Models
         public string Address { get; set; }
         public EUserType Type { get; set; }
         public string Picture { get; set; }
+        public ERequestStatus DelivererRequestStatus { set; get; }
         public List<Order> Orders { get; set; }
         public List<Order> OrdersToDiliver { get; set; }
     }
