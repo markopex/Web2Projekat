@@ -13,6 +13,7 @@ namespace Backend.Mapping
             CreateMap<OrderDetail, CreateOrderDetailDto>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, LoginDto>().ReverseMap();
+            CreateMap<User, RegisterDto>().ReverseMap();
         }
     }
 }

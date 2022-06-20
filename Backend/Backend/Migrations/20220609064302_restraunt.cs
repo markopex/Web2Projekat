@@ -2,7 +2,7 @@
 
 namespace Backend.Migrations
 {
-    public partial class Restoraunt : Migration
+    public partial class restraunt : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,6 +28,7 @@ namespace Backend.Migrations
                 {
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Birthday = table.Column<string>(type: "nvarchar(max)", nullable: false),

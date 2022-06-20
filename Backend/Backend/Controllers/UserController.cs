@@ -1,8 +1,6 @@
-﻿using Backend.Infrastructure;
-using Microsoft.AspNetCore.Http;
+﻿using Backend.Dto;
+using Backend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
@@ -10,11 +8,37 @@ namespace Backend.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private RestorauntDbContext _context;
-        public UserController(RestorauntDbContext context)
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
+
+        [HttpPost("login")]
+        public IActionResult Post([FromBody] LoginDto dto)
+        {
+            var retVal = _userService.Login(dto);
+            if (retVal == null) return BadRequest();
+            return Ok(retVal);
+        }
+
+        [HttpPost("register")]
+        public IActionResult Post([FromBody] RegisterDto dto)
+        {
+            var retVal = _userService.Register(dto);
+            if (retVal == null) return BadRequest();
+            return Ok();
+        }
+
+        [HttpGet("register")]
+        public IActionResult GetUser([FromBody] RegisterDto dto)
+        {
+            var retVal = _userService.Register(dto);
+            if (retVal == null) return BadRequest();
+            return Ok();
+        }
+
         /*
         [HttpGet]
         [Route("GetUserProfile")]

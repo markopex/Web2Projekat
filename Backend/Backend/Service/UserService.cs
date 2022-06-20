@@ -30,7 +30,7 @@ namespace Backend.Service
 
         public string Login(LoginDto loginDto)
         {
-            User user = _dbContext.Users.ToList().First(x => x.Username == loginDto.Username);
+            User user = _dbContext.Users.ToList().Find(x => x.Username == loginDto.Username);
 
             if (user == null)
                 return null;
@@ -61,7 +61,19 @@ namespace Backend.Service
 
         public UserDto Register(RegisterDto registerDto)
         {
-            throw new System.NotImplementedException();
+            User user = _dbContext.Users.ToList().Find(x => x.Username == registerDto.Username);
+            if (user != null) return null;
+
+            user = _mapper.Map<User>(registerDto);
+            user.Type = EUserType.CUSTOMER;
+            user.Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+            _dbContext.Add(user);
+            _dbContext.SaveChanges();
+
+            var retVal = _mapper.Map<UserDto>(_dbContext.Users.ToList().Find(x => x.Username == registerDto.Username));
+
+            return retVal;
         }
     }
 }

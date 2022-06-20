@@ -9,6 +9,7 @@ using Backend.Infrastructure;
 using Backend.Models;
 using Backend.Interfaces;
 using Backend.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
@@ -41,6 +42,7 @@ namespace Backend.Controllers
 
         // PUT: api/Products/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> PutProduct(int id, ProductDto product)
         {
             if (_productService.GetById(id) == null)
@@ -50,6 +52,7 @@ namespace Backend.Controllers
 
         // POST: api/Products
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult PostProduct(ProductDto product)
         {
             return Ok(_productService.AddProduct(product));

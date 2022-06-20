@@ -9,6 +9,7 @@ using Backend.Infrastructure;
 using Backend.Models;
 using Backend.Interfaces;
 using Backend.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
@@ -71,6 +72,7 @@ namespace Backend.Controllers
         // POST: api/Orders
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "CUSTOMER")]
         public IActionResult PostOrder(CreateOrderDto createOrderDto)
         {
             return Ok(_orderService.AddOrder(createOrderDto));
