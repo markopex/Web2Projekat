@@ -1,6 +1,11 @@
 ﻿using Backend.Dto;
 using Backend.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -31,28 +36,57 @@ namespace Backend.Controllers
             return Ok();
         }
 
-        [HttpGet("register")]
-        public IActionResult GetUser([FromBody] RegisterDto dto)
+        [HttpPost, DisableRequestSizeLimit]
+        public IActionResult UploadProfilePhoto()
         {
-            var retVal = _userService.Register(dto);
-            if (retVal == null) return BadRequest();
-            return Ok();
+            try
+            {
+                var file = Request.Form.Files[0];
+                var folderName = Path.Combine("Resources", "Images");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                if (file.Length > 0)
+                {
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var fullPath = Path.Combine(pathToSave, fileName);
+                    var dbPath = Path.Combine(folderName, fileName);
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    return Ok(new { dbPath });
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
         }
 
-        /*
-        [HttpGet]
-        [Route("GetUserProfile")]
-        //GET : /api/UserProfile
-        public async Task<Object> GetUserProfile()
+        [HttpPost("apply")]
+        [Authorize(Roles = "CUSTOMER")]
+        public IActionResult ApplyForDeliverer(string customerUsername)
         {
-            string userId = _context.Users.Find(id).Orders;
-            return new
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+            try
             {
-                user.FullName,
-                user.Email,
-                user.UserName
-            };
+                _userService.Apply(customerUsername);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
         }
-        */
+        [HttpGet("pending-deliverers")]
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult PendingDelivers()
+        {
+            return Ok(_userService.PendingUsers());
+        }
     }
 }

@@ -15,11 +15,11 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
 
-        public ProductsController(IProductService productService)
+        public ProductController(IProductService productService)
         {
             _productService = productService;
         }
@@ -43,7 +43,7 @@ namespace Backend.Controllers
         // PUT: api/Products/5
         [HttpPut("{id}")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> PutProduct(int id, ProductDto product)
+        public IActionResult PutProduct(int id, ProductDto product)
         {
             if (_productService.GetById(id) == null)
                 return NotFound();

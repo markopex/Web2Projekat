@@ -1,4 +1,5 @@
 ﻿using Backend.Dto;
+using System.Collections.Generic;
 
 namespace Backend.Interfaces
 {
@@ -6,5 +7,7 @@ namespace Backend.Interfaces
     {
         string Login(LoginDto loginDto);
         UserDto Register(RegisterDto registerDto);
+        void Apply(string customerUsername);
+        public List<UserDto> PendingUsers();
     }
 }

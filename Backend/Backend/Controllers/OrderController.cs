@@ -15,30 +15,30 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
 
-        public OrdersController(IOrderService orderService)
+        public OrderController(IOrderService orderService)
         {
             _orderService = orderService;
         }
 
-        // GET: api/Orders
+        // GET: api/Order
         [HttpGet]
         public IActionResult GetOrders()
         {
             return Ok(_orderService.GetOrders());
         }
 
-        // GET: api/Orders/5
+        // GET: api/Order/5
         [HttpGet("{id}")]
         public IActionResult GetOrder(int id)
         {
             return Ok(_orderService.GetOrders());
         }
 
-        //// PUT: api/Orders/5
+        //// PUT: api/Order/5
         //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         //[HttpPut("{id}")]
         //public IActionResult PutOrder(int id, Order order)
@@ -69,7 +69,7 @@ namespace Backend.Controllers
         //    return NoContent();
         //}
 
-        // POST: api/Orders
+        // POST: api/Order
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "CUSTOMER")]

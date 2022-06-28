@@ -28,6 +28,19 @@ namespace Backend.Service
             _dbContext = dbContext;
         }
 
+        public void Apply(string customerUsername)
+        {
+            User user = _dbContext.Users.ToList().Find(x => x.Username == customerUsername.ToLower());
+            if (user != null) throw new Exception("There is no user with username: " + customerUsername);
+
+            if (user.Type != EUserType.CUSTOMER) throw new Exception("User is not customer!");
+            if (user.DelivererRequestStatus == ERequestStatus.NO_REQUEST) throw new Exception("Customer already applied!");
+
+            user.DelivererRequestStatus = ERequestStatus.PEDNING;
+            _dbContext.SaveChanges();
+        }
+
+
         public string Login(LoginDto loginDto)
         {
             User user = _dbContext.Users.ToList().Find(x => x.Username == loginDto.Username);
@@ -39,7 +52,7 @@ namespace Backend.Service
             {
                 List<Claim> claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.Role, UserType.GetString(user.Type))); //Add user type to claim
-
+                claims.Add(new Claim(ClaimTypes.Name, user.Username));
                 //Kreiramo kredencijale za potpisivanje tokena. Token mora biti potpisan privatnim kljucem
                 //kako bi se sprecile njegove neovlascene izmene
                 SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey.Value));
@@ -59,6 +72,11 @@ namespace Backend.Service
             }
         }
 
+        public List<UserDto> PendingUsers()
+        {
+            return _mapper.Map<List<UserDto>>(_dbContext.Users.ToList().FindAll(i => i.DelivererRequestStatus != ERequestStatus.NO_REQUEST));
+        }
+
         public UserDto Register(RegisterDto registerDto)
         {
             User user = _dbContext.Users.ToList().Find(x => x.Username == registerDto.Username);
@@ -67,6 +85,7 @@ namespace Backend.Service
             user = _mapper.Map<User>(registerDto);
             user.Type = EUserType.CUSTOMER;
             user.Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+            user.Username = user.Username.ToLower();
 
             _dbContext.Add(user);
             _dbContext.SaveChanges();
