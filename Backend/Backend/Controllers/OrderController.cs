@@ -10,6 +10,7 @@ using Backend.Models;
 using Backend.Interfaces;
 using Backend.Dto;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -39,7 +40,6 @@ namespace Backend.Controllers
         }
 
         //// PUT: api/Order/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         //[HttpPut("{id}")]
         //public IActionResult PutOrder(int id, Order order)
         //{
@@ -75,7 +75,15 @@ namespace Backend.Controllers
         [Authorize(Roles = "CUSTOMER")]
         public IActionResult PostOrder(CreateOrderDto createOrderDto)
         {
-            return Ok(_orderService.AddOrder(createOrderDto));
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+            try
+            {
+                return Ok(_orderService.AddOrder(username, createOrderDto));
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -19,6 +19,22 @@ namespace Backend.Controllers
         {
             _userService = userService;
         }
+        [HttpGet]
+        public IActionResult GetUser()
+        {
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+            try
+            {
+                _userService.GetUser(username);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
 
         [HttpPost("login")]
         public IActionResult Post([FromBody] LoginDto dto)
@@ -66,7 +82,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("apply")]
+        [HttpPost("deliverer/apply")]
         [Authorize(Roles = "CUSTOMER")]
         public IActionResult ApplyForDeliverer(string customerUsername)
         {
@@ -82,7 +98,7 @@ namespace Backend.Controllers
 
             return Ok();
         }
-        [HttpGet("pending-deliverers")]
+        [HttpGet("deliverer")]
         [Authorize(Roles = "ADMIN")]
         public IActionResult PendingDelivers()
         {

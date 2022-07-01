@@ -40,8 +40,12 @@ namespace Backend.Service
             _dbContext.SaveChanges();
         }
 
+        public UserDto GetUser(string userEmail)
+        {
+            return _mapper.Map<UserDto>(_dbContext.Users.Find(userEmail));
+        }
 
-        public string Login(LoginDto loginDto)
+        public TokenDto Login(LoginDto loginDto)
         {
             User user = _dbContext.Users.ToList().Find(x => x.Username == loginDto.Username);
 
@@ -64,7 +68,11 @@ namespace Backend.Service
                     signingCredentials: signinCredentials //kredencijali za potpis
                 );
                 string tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-                return tokenString;
+                return new TokenDto()
+                {
+                    Token = tokenString,
+                    Role = user.Type.ToString()
+                };
             }
             else
             {
@@ -83,7 +91,7 @@ namespace Backend.Service
             if (user != null) return null;
 
             user = _mapper.Map<User>(registerDto);
-            user.Type = EUserType.CUSTOMER;
+            user.Type = EUserType.ADMIN;
             user.Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
             user.Username = user.Username.ToLower();
 
@@ -93,6 +101,11 @@ namespace Backend.Service
             var retVal = _mapper.Map<UserDto>(_dbContext.Users.ToList().Find(x => x.Username == registerDto.Username));
 
             return retVal;
+        }
+
+        public UserDto UpdateUser(UserDto user)
+        {
+            throw new NotImplementedException();
         }
     }
 }
